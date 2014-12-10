@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">KiiGateKeeper</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_signin">SignInActivity</string>
+    <string name="title_activity_scan">ScanActivity</string>
+    <string name="title_activity_monitoring">MonitoringActivity</string>
+    <string name="title_activity_ranging">RangingActivity</string>
+    <string name="title_activity_manage">ManageActivity</string>
+    <string name="title_activity_access_log">AccessLogActivity</string>
+    <string name="need_to_login_first">You need to sign in or sign up first to try this</string>
+    <string name="no_beacon_detected">No beacon detected, please open beacon transmitter first</string>
+    <string name="fetch_beacon_first">Please fetch beacon first</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="add_security">add user to security</string>
+    <string name="add_employee">add user to employee</string>
+    <string name="unknown_device">The device is unknown</string>
+    <string name="ble_not_supported">BLE is not supported</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+    <string name="user_not_found">User not found</string>
+
+</resources>
