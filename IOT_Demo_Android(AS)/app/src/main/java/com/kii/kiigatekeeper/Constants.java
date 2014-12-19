@@ -10,5 +10,8 @@ public class Constants {
 
     public static final String              KII_APP_ID = "d521a372";
     public static final String              KII_APP_KEY = "a5b2f02a13efa9d71604106bd598a022";
-    public static final Site                KIIS_SITE = Kii.Site.US;
+    public static final Site                KIIS_SITE = Site.US;
+
+    public static final String              SECURITY_GROUP_NAME = "security";
+    public static final String              EMPLOYEE_GROUP_NAME = "employee";
 }

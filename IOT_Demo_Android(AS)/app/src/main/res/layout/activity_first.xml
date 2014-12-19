@@ -9,12 +9,18 @@
         android:id="@+id/scan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Scan" />
+        android:text="Activate door control" />
 
     <Button
         android:id="@+id/app"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="App" />
+
+    <Button
+        android:id="@+id/register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"/>
 
 </LinearLayout>

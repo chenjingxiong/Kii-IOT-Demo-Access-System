@@ -140,6 +140,7 @@ public class AccessLogActivity extends Activity {
 
             @Override
             public void onFailure(HttpException error, String msg) {
+                mProgressDialog.dismiss();
                 Toast.makeText(AccessLogActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -243,7 +244,7 @@ public class AccessLogActivity extends Activity {
         KiiQuery all_query = new KiiQuery();
         KiiQueryResult<KiiObject> result = Kii.bucket("access_log").query(all_query);
         mObjLists = result.getResult();
-    }catch (IOException e) {
+    } catch (IOException e) {
         // handle error
     } catch (AppException e) {
         // handle error

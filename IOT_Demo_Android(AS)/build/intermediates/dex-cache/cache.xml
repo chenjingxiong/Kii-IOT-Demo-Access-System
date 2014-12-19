@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/yue/Documents/Android/Kii/KiiGateKeeper/app/libs/android-async-http-1.4.6.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="a845a88238be0b5be9d238652c1bc0605ef91f52">
+        <dex dex="/Users/yue/Documents/Android/Kii/KiiGateKeeper/app/build/intermediates/pre-dexed/debug/android-async-http-1.4.6-5b49a833094c41de29ecb486a13cfc054bb3cfd2.jar" />
+    </item>
+    <item
+        jar="/Users/yue/Documents/Android/Kii/KiiGateKeeper/app/libs/KiiCloudStorageSDK_release_v2.1.29_e24f761.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="a76101cc29bcec7590f1d521a68f68602be50cc3">
+        <dex dex="/Users/yue/Documents/Android/Kii/KiiGateKeeper/app/build/intermediates/pre-dexed/debug/KiiCloudStorageSDK_release_v2.1.29_e24f761-12b6f7d3e93c4d6773cbcd534efb804e79c094c1.jar" />
+    </item>
+    <item
+        jar="/Users/yue/Documents/Android/Kii/KiiGateKeeper/app/libs/xUtils-2.6.11.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="7f937dde1807afee0d7866b3bf019842346107b9">
+        <dex dex="/Users/yue/Documents/Android/Kii/KiiGateKeeper/app/build/intermediates/pre-dexed/debug/xUtils-2.6.11-6503040b7b426222cee579ba0e987c3769cf34a8.jar" />
+    </item>
+
+</items>

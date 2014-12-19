@@ -1,11 +1,11 @@
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <netinet/if_ether.h>
 #include <net/if.h>
-// #include <linux/sockios.h>
+//#include <linux/sockios.h>
 #include <ctype.h>  
 
 
@@ -22,6 +22,8 @@ void kiiDemo_callback(char* jsonBuf, int rcvdCounter)
     char objectID[KII_OBJECTID_SIZE+1];
     char bucketName[KII_BUCKET_NAME_SIZE+1];
     char jsonObject[512];
+    char userName[256];
+    char authority[10];
 
     p1 = strstr(jsonBuf, "objectID");
     if (p1 != NULL)
@@ -52,7 +54,50 @@ void kiiDemo_callback(char* jsonBuf, int rcvdCounter)
 	}
 	else
 	{
-            printf("\r\n%s\r\n",jsonObject);
+            //printf("\r\n%s\r\n",jsonObject);
+            p1 = strstr(jsonObject, "\"username\":\"");
+	     if (p1 == NULL)
+	     {
+	         printf("invalid username\r\n");
+	         return;
+	     }
+	     p1 +=12;
+	     p2 = strstr(p1, "\"");
+	     if (p2 == NULL)
+	     {
+	         printf("invalid username\r\n");
+	         return;
+	     }
+	     memset(userName, 0, sizeof(userName));
+	     memcpy(userName, p1, p2-p1);
+	     p1 = strstr(jsonObject, "\"authority\":");
+	     if (p1 == NULL)
+	     {
+	         printf("invalid authority\r\n");
+	         return;
+	     }
+	     p1 +=12;
+	     p2 = strstr(p1, "\"");
+	     if (p2 == NULL)
+	     {
+	         printf("invalid authority\r\n");
+	         return;
+	     }
+	     memset(authority, 0, sizeof(authority));
+	     memcpy(authority, p1, p2-p1);
+            printf("\r\n");
+            printf("%s", userName);
+            printf("  ---------> ");
+	     if (strcmp(authority, "true,") == 0)
+	     {
+                printf("authorized");
+	     }
+	     else
+	     {
+                printf("unauthorized");
+	     }
+            printf("\r\n");
+	     fflush(stdout);
 	}
     }
 }

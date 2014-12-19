@@ -2,12 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.kii.kiigatekeeper.ManageActivity" >
 
-    <item android:id="@+id/security"
+    <item android:id="@+id/item_security"
         android:title="@string/add_security"
         android:orderInCategory="100"
-        android:showAsAction="never|withText" />
+        android:showAsAction="never|withText"/>
 
-    <item android:id="@+id/employee"
+    <item android:id="@+id/item_employee"
         android:title="@string/add_employee"
         android:orderInCategory="100"
         android:showAsAction="never|withText" />

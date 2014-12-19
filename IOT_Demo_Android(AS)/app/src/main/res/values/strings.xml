@@ -20,5 +20,11 @@
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
     <string name="user_not_found">User not found</string>
+    <string name="input_user_name">input user name</string>
+    <string name="title_activity_manager_security">ManagerSecurityActivity</string>
+    <string name="title_activity_manage_employee">ManageEmployeeActivity</string>
+    <string name="title_activity_manage_anonymous">ManageAnonymousActivity</string>
+    <string name="title_activity_group_choice">GroupChoiceActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
 
 </resources>

@@ -6,19 +6,16 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,8 +24,6 @@ import com.kii.cloud.storage.Kii;
 import com.kii.cloud.storage.KiiServerCodeEntry;
 import com.kii.cloud.storage.KiiServerCodeEntryArgument;
 import com.kii.cloud.storage.KiiServerCodeExecResult;
-import com.kii.cloud.storage.KiiUser;
-import com.kii.cloud.storage.UserFields;
 import com.kii.cloud.storage.exception.app.AppException;
 
 import org.json.JSONException;
@@ -38,9 +33,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class ScanActivity extends Activity {
+public class DoorControlActivity extends Activity {
 
-    private final static String TAG = ScanActivity.class.getSimpleName();
+    private final static String TAG = DoorControlActivity.class.getSimpleName();
     private LeDeviceListAdapter mLeDeviceListAdapter;
     /**搜索BLE终端*/
     private BluetoothAdapter mBluetoothAdapter;
@@ -50,8 +45,6 @@ public class ScanActivity extends Activity {
     private Boolean mDistanceCheck = true;
     private String mBeaconMajorMinor = null;
     private ListView mListView = null;
-    private EditText mUsernameEdit, mPasswordEdit;
-    private KiiUser user;
 
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 600000;
@@ -59,11 +52,9 @@ public class ScanActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan);
+        setContentView(R.layout.activity_doorcontrol);
 
         mListView = (ListView)findViewById(R.id.list);
-        mUsernameEdit = (EditText)findViewById(R.id.username);
-        mPasswordEdit = (EditText)findViewById(R.id.password);
 
         mHandler = new Handler();
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -88,88 +79,6 @@ public class ScanActivity extends Activity {
         //开启蓝牙
         mBluetoothAdapter.enable();
     }
-
-    public void onRegisterClicked(View view){
-        if(mBeaconMajorMinor == null){
-            Toast.makeText(ScanActivity.this, R.string.no_beacon_detected, Toast.LENGTH_LONG).show();
-        }else {
-            String[] text = new String[2];
-            text[0] = mUsernameEdit.getText().toString();
-            text[1] = mPasswordEdit.getText().toString();
-            if (!KiiUser.isValidUserName(text[0])) {
-                Toast.makeText(ScanActivity.this, "Username is not valid", Toast.LENGTH_LONG).show();
-                return;
-            }
-            if (!KiiUser.isValidPassword(text[1])) {
-                Toast.makeText(ScanActivity.this, "Password is not valid", Toast.LENGTH_LONG)
-                        .show();
-                return;
-            }
-            new RegTask().execute(text[0], text[1]);
-        }
-    }
-
-
-    class RegTask extends AsyncTask<String, Void, Void> {
-        ProgressDialog progressDialog = null;
-        String token = null;
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new ProgressDialog(ScanActivity.this);
-            progressDialog.setMessage("Registering");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            String username = params[0];
-            String password = params[1];
-
-            KiiUser.Builder builder = KiiUser.builderWithName(username);
-            user = builder.build();
-            try {
-                user.register(password);
-
-                UserFields userFields = new UserFields();
-                userFields.set("bluetooth_addr", mBeaconMajorMinor);
-                user.update(userFields);
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            token = user.getAccessToken();
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            progressDialog.dismiss();
-
-            Activity activity = ScanActivity.this;
-
-            if (TextUtils.isEmpty(token)) {
-                Toast.makeText(activity,
-                        "Reg or login failed, please try again later",
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Utils.saveToken(activity.getApplicationContext(), token);
-                Toast.makeText(activity, "Login successful",
-                        Toast.LENGTH_LONG).show();
-
-                Intent intent = new Intent(ScanActivity.this, UserActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }
-    }
-
 
     @Override
     protected void onResume() {
@@ -311,12 +220,12 @@ public class ScanActivity extends Activity {
             viewHolder.devicetxPower_RSSI.setText("txPower:"+device.txPower+",rssi:"+device.rssi);
             mBeaconMajorMinor = String.valueOf(device.major) + String.valueOf(device.minor);
 
-            if(device.rssi >= -20 && mDistanceCheck == true){
+            if(device.rssi >= -30 && mDistanceCheck == true){
                 new AuthoriseTask().execute();
                 mDistanceCheck = false;
             }
 
-            if(device.rssi <= -45 && mDistanceCheck == false){
+            if(device.rssi <= -60 && mDistanceCheck == false){
                 mDistanceCheck = true;
             }
             return view;
@@ -331,7 +240,7 @@ public class ScanActivity extends Activity {
         }
     }
 
-
+    //Using server extension to authorize
     class AuthoriseTask extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog progressDialog = null;
@@ -341,7 +250,7 @@ public class ScanActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(ScanActivity.this);
+            progressDialog = new ProgressDialog(DoorControlActivity.this);
             progressDialog.setMessage("Authorising");
             progressDialog.setCancelable(false);
             progressDialog.show();
@@ -369,11 +278,8 @@ public class ScanActivity extends Activity {
                 returnedValue = returned.getString("returnedValue");
 
             } catch (AppException ae) {
-                Toast.makeText(ScanActivity.this, ae.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             } catch (IOException ie) {
-                Toast.makeText(ScanActivity.this, ie.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             } catch (JSONException je) {
-                Toast.makeText(ScanActivity.this, je.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
             return null;
         }
@@ -382,7 +288,20 @@ public class ScanActivity extends Activity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
-            Toast.makeText(ScanActivity.this, returnedValue, Toast.LENGTH_LONG).show();
+
+            Toast toast = new Toast(DoorControlActivity.this);
+            View toastRoot = getLayoutInflater().inflate(R.layout.toast_authorize, null);
+            TextView message = (TextView) toastRoot.findViewById(R.id.message);
+            toast.setView(toastRoot);
+            toast.setDuration(Toast.LENGTH_LONG);
+            if(returnedValue.equals("true")){
+                message.setText("Authorized");
+                toast.show();
+            }else{
+                message.setText("Unauthorized");
+                toast.show();
+            }
+
         }
     }
 

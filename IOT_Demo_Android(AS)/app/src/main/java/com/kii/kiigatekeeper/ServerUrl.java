@@ -5,6 +5,6 @@ package com.kii.kiigatekeeper;
  */
 public class ServerUrl {
 
-    public static String url = "https://api.kii.com/api/apps/d521a372/things/VENDOR_THING_ID:access_system/buckets/access_log/query";
+    public static String url = "https://api.kii.com/api/apps/"+Constants.KII_APP_ID+"/things/VENDOR_THING_ID:access_system/buckets/access_log/query";
 
 }

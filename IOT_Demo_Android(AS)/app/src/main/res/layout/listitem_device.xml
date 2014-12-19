@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="name"
-        android:textSize="32sp" />
+        android:textSize="@dimen/text_large" />
 
     <TextView
         android:id="@+id/device_address"
@@ -51,6 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="txPower_rssi"
-        android:textSize="30dp" />
+        android:textSize="@dimen/text_large" />
 
 </LinearLayout>

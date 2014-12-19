@@ -9,12 +9,19 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.kii.kiigatekeeper.UserActivity">
 
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_normal"/>
+
     <Button
         android:id="@+id/btn_manage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onManageClicked"
-        android:text="Manage" />
+        android:text="Manage"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/btn_log"
@@ -23,4 +30,10 @@
         android:onClick="onAccessLogClicked"
         android:text="Access Log" />
 
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onLogoutClicked"
+        android:text="Logout"/>
 </LinearLayout>
