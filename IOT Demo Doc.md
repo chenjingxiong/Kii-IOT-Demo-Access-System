@@ -1,3 +1,4 @@
+#Kii Cloud物联网Demo技术文档
 ##背景简介
 ![](https://raw.githubusercontent.com/leonardean/ImgUpload/master/B.png)
 
@@ -21,6 +22,7 @@
 * 一个用作安全监视器的设备。当有进入事件发生的时候，云端则会发出一条基于MQTT协议的推送消息，安全监视器则会接收并显示此消息，当该进入记录为无权限进入时，则会开启警报。
  
 下图是整个应用场景的展示：
+
 ![](http://chuantu.biz/t/55/1417748803x-1376440095.png)
 ##后台设计
 以上所述的应用场景可以通过充分利用Kii Cloud的功能特性来进行后台设计。以下将从用户，群组，设备，数据管理，权限，推送机制等方面阐述如何在Kii Cloud中搭建一个适用于以上物联网场景的云端服务：
@@ -44,6 +46,7 @@
 如上文所述，安全监视器可以接收到每次进入房间事件的推送消息，而这种基于MQTT协议的推送则可以使用Kii Cloud的[Push to App](http://documentation.kii.com/cn/starts/cloudsdk/managing-push-notification/push_kiicloud/push-to-app/)推送机制来实现。只需安全监视器订阅Bucket `access_log`即可，每当该Bucket有新Object被添加时，Kii Cloud都会向安全监视器推送Object被添加的MQTT消息。
 
 综上所述，针对本文引入的应用场景，可以利用Kii Cloud设计出如下图所示的后台结构。
+
 ![](http://oi61.tinypic.com/34q1h93.jpg)
 
 ##技术实现
@@ -54,13 +57,15 @@
 * 本Demo中的门禁系统为安卓应用，除了用于扫描蓝牙Beacon信号以接收房间进入请求外，该安卓应用还可用于用户的注册、登录，群组管理，以及房间进入记录的查询。
 
 下文将详细介绍本Demo中的技术实现方法。
+Kii Cloud物联网Demo技术文档
+=========================
 ###1.基础搭建
 基础搭建是一些非应用的操作，这些操作将为本Demo构建基本的用户，设备，以及群组。以下操作均为REST API调用。注意：开发者在进行如下操作时需要根据各自情况替换以下字段：
 
 * `appID`
 * `appKey`
 * 安保组长的`loginName`、`password`、`access_token`
-* 门禁系统的`access_token`
+* 门禁系统的`_venderThingID`、`_password`、`access_token`
 * `security`组、`employee`组的`groupName`和`groupID`
 
 开发者同样需要记录上述字段以用于安卓、server extension、安全监视器代码的调试部署。
