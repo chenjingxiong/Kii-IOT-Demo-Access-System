@@ -35,12 +35,14 @@
 ####数据管理
 在本应用中会有两个Bucket，分别是：
 
-* `security`组下的Group域Bucket `security_profile`。这个Bucket用于存放和管理所有用户的安全档案，当每个用户被创建的时候，Server Extension就会在该Bucket中添加一个新的用户档案。该档案也是判断用户是否有权限进入房间的唯一依据。`security`组中的成员对该Bucket有最高的控制权限。当用户被添加至`security`组或`employee`组时或者从这两个组中被删除时，Server Extension都会修改存储该用户档案的Object。该类Object包含的字段有：`username`, `user_UUID`, `bluetooth_addr`, `authority`, `<groupName>`。其中`<groupName>`字段为两个用户群组的名称，用于表达该用户是否在相应的群组中。
+* `security`组下的群组级Bucket `security_profile`。这个Bucket用于存放和管理所有用户的安全档案，当每个用户被创建的时候，Server Extension就会在该Bucket中添加一个新的用户档案。该档案也是判断用户是否有权限进入房间的唯一依据。`security`组中的成员对该Bucket有最高的控制权限。当用户被添加至`security`组或`employee`组时或者从这两个组中被删除时，Server Extension都会修改存储该用户档案的Object。该类Object包含的字段有：`username`, `user_UUID`, `bluetooth_addr`, `authority`, `<groupName>`。其中`<groupName>`字段为两个用户群组的名称，用于表达该用户是否在相应的群组中。
+	
+	在此使用Kii Cloud群组级Bucket充分利用了群组级Bucket的默认权限列表，从而使得该群组`security`内的成员都能够对该Bucket内的数据进行查看和修改，同时该群组以外的用户均无权限对该Bucket内数据进行查询和修改。无需额外对Bucket及数据设置权限列表却有效保证了数据的安全性。
 * 另一个Bucket `access_log`用于存放进入房间事件的记录。为了确保该Bucket中的数据安全且不会被篡改(即便安保组长也不应有权限更改记录)，特别设置为门禁系统设备下的Thing域Bucket。每当门禁系统接收到一次来自用户的进入请求时，Server Extension就会依据Bucket `security_profile` 中的档案对此次进入的权限进行判断，然后把结果返回给门禁系统设备，并把此次进入事件添加到`access_log`中。
 
 
 ####权限列表
-本应用截止至此已经通过群组以及Bucket域实现了一部分的权限控制：除了应用admin之外，只有`security`组成员可以对Group域Bucket `security_profile`进行数据更改，普通用户无法更改；没有任何用户可以对Bucket `access_log`中的数据进行更改，确保了记录的真实性和安全性。然而仍需要对`access_log`及其中的Object进行权限列表的更改以使得其中Object可以完全被`security`组成员读取，且可以被单个Object所涉及的个人用户所读取。这样，安保组就可以查看所有的进入记录，而每个非安保组的注册用户则可以查看到自己的进入记录。
+本应用截止至此已经通过群组以及Bucket域实现了一部分的权限控制：除了应用admin之外，只有`security`组成员可以对群组级Bucket `security_profile`进行数据更改，普通用户无法更改；没有任何用户可以对Bucket `access_log`中的数据进行更改，确保了记录的真实性和安全性。然而仍需要对`access_log`及其中的Object进行权限列表的更改以使得其中Object可以完全被`security`组成员读取，且可以被单个Object所涉及的个人用户所读取。这样，安保组就可以查看所有的进入记录，而每个非安保组的注册用户则可以查看到自己的进入记录。
 
 ####推送机制
 如上文所述，安全监视器可以接收到每次进入房间事件的推送消息，而这种基于MQTT协议的推送则可以使用Kii Cloud的[Push to App](http://documentation.kii.com/cn/starts/cloudsdk/managing-push-notification/push_kiicloud/push-to-app/)推送机制来实现。只需安全监视器订阅Bucket `access_log`即可，每当该Bucket有新Object被添加时，Kii Cloud都会向安全监视器推送Object被添加的MQTT消息。
@@ -52,13 +54,12 @@
 ##技术实现
 为了使本文中的Demo可以更方便地被编译、运行和调试，在此尽可能地减少了对硬件设备的要求，故做出了以下举措。
 
-* 使用现有的[iOS应用](https://itunes.apple.com/us/app/locate-beacon/id738709014?mt=8)作为蓝牙Beacon发射器。通常蓝牙设备的蓝牙地址是唯一的且可以作为该设备的身份标识，本应用拟用蓝牙地址作为代表用户身份的标识并与用户账号绑定。但苹果刻意将蓝牙地址随机化，所以本着Demo的目的，将Beacon信号的Minor/Major值作为身份标识。
+* 截止至本文档撰写，Kii Cloud仅美服和日服有设备管理功能，所以本Demo使用了美服应用。欲对本Demo中的代码进行调试，请开发者使用美服或者日服应用。
+* 本Demo使用现有的[iOS应用](https://itunes.apple.com/us/app/locate-beacon/id738709014?mt=8)作为蓝牙Beacon发射器。(安卓5.0以上系统也可作为Beacon发射器)通常蓝牙设备的蓝牙地址是唯一的且可以作为该设备的身份标识，本应用拟用蓝牙地址作为代表用户身份的标识并与用户账号绑定。但苹果刻意将蓝牙地址随机化，所以本着Demo的目的，将Beacon信号的Minor/Major值作为身份标识。
 * 本Demo将安全监视器设备模拟为可以运行于PC上的命令行程序。其运行的嵌入式代码同样适用于载有Linux系统芯片的硬件设备。
 * 本Demo中的门禁系统为安卓应用，除了用于扫描蓝牙Beacon信号以接收房间进入请求外，该安卓应用还可用于用户的注册、登录，群组管理，以及房间进入记录的查询。
 
 下文将详细介绍本Demo中的技术实现方法。
-Kii Cloud物联网Demo技术文档
-=========================
 ###1.基础搭建
 基础搭建是一些非应用的操作，这些操作将为本Demo构建基本的用户，设备，以及群组。以下操作均为REST API调用。注意：开发者在进行如下操作时需要根据各自情况替换以下字段：
 
@@ -210,7 +211,7 @@ try {
 }
 ~~~
 ####2.2 Server Extension
-在新用户注册并绑定其蓝牙标识后，Kii Cloud会通过触发器自动执行指定Server Extension函数，从而将新用户资料添加到Group域Bucket `security_profile`中。
+在新用户注册并绑定其蓝牙标识后，Kii Cloud会通过触发器自动执行指定Server Extension函数，从而将新用户资料添加到群组级Bucket `security_profile`中。
 #####Hook.config文件
 ```
 {
@@ -551,7 +552,62 @@ function modify_access_log_acl(data, done, secure_profile) {
   });
 }
 ~~~
-###7.MQTT消息推送
+###7.获取Access Log
+从安卓应用可以用如下方式获取Access Log。由于在先前的步骤中对Bucket `access_log`以及所包含的Object的权限列表做出了改动，根据当前登录用户身份的不同，所获取的数据也有所不同：
+
+* `security`组中的用户将可以看到所有的Access Log
+* `employee`组中得用户仅可以看到自己的Access Log
+* 没有被加入以上两个组中得用户无法看到任何Access Log
+
+#####Java代码
+~~~java
+private void FetchAccessLog(final JSONObject jsonObject){
+
+  RequestParams params = new RequestParams();
+
+  params.setHeader("x-kii-appid", Constants.KII_APP_ID);
+  params.setHeader("x-kii-appkey", Constants.KII_APP_KEY);
+  params.setHeader("content-type", "application/vnd.kii.QueryRequest+json");
+  params.setHeader("Authorization", "Bearer "+ mKiiUser.getAccessToken());
+
+  try {
+    params.setBodyEntity(new StringEntity(jsonObject.toString()));
+  }catch (UnsupportedEncodingException e){
+    Toast.makeText(AccessLogActivity.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+  }
+
+  HttpUtils http = new HttpUtils();
+  http.send(HttpRequest.HttpMethod.POST, ServerUrl.url,params, new RequestCallBack<Object>() {
+    @Override
+    public void onStart() {
+        mProgressDialog.show();
+    }
+
+    //数据成功后开始绑定
+    @Override
+    public void onSuccess(ResponseInfo<Object> objectResponseInfo) {
+      try {
+        mJsonObject = new JSONObject((String) objectResponseInfo.result);
+
+        mJsonArray = mJsonObject.getJSONArray("results");
+        mAccessLogNum = mJsonArray.length();
+
+        getData(mJsonArray);
+
+      }catch (JSONException e){
+        e.printStackTrace();
+      }
+    }
+
+    @Override
+    public void onFailure(HttpException error, String msg) {
+      mProgressDialog.dismiss();
+      Toast.makeText(AccessLogActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+    }
+  });
+}
+~~~
+###8.MQTT消息推送
 本Demo的另一设备安全监视器，担任着接收房间进入事件推送消息的角色。安全监视器订阅Bucket `access_log`，当有新的数据Object被添加到Bucket中时，Kii Cloud便会自动向安全监视器推送MQTT消息。
 #####C代码
 ~~~c
