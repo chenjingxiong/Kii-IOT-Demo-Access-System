@@ -47,7 +47,7 @@ public class ManageActivity extends Activity {
     private KiiUser mKiiUser, mAddedUser;
     private String mAddedUserName;
     private KiiGroup mSecurityGroup, mEmployeeGroup;
-    private EmployeeAdapter mEmployeeAdapter;
+    private MemberAdapter mEmployeeAdapter;
     private ListView mListview;
     private KiiBucket mKiiBucket;
     private List<KiiObject> mObjLists;
@@ -75,6 +75,7 @@ public class ManageActivity extends Activity {
 
         Intent intent = this.getIntent();
         mUserType = intent.getStringExtra("UserType");
+        //Fetch the group name
         mGroupChoice = intent.getStringExtra("group");
 
         mProgressDialog = new ProgressDialog(ManageActivity.this);
@@ -83,12 +84,13 @@ public class ManageActivity extends Activity {
         mProgressDialog.show();
 
         mListview = (ListView)findViewById(R.id.list);
-        mEmployeeAdapter = new EmployeeAdapter(ManageActivity.this);
+        mEmployeeAdapter = new MemberAdapter(ManageActivity.this);
         mListview.setAdapter(mEmployeeAdapter);
 
         mKiiUser = KiiUser.getCurrentUser();
         Log.i("the access token", mKiiUser.getAccessToken());
 
+        // Fetch all the groups
         mKiiUser.memberOfGroups(new KiiUserCallBack() {
             @Override
             public void onMemberOfGroupsCompleted(int token, KiiUser user, List<KiiGroup> groupList, Exception exception) {
@@ -100,46 +102,15 @@ public class ManageActivity extends Activity {
                     }else if(group.getGroupName().equals("employee")){
                         mEmployeeGroup = group;
                     }
-                    mFinalGroup = group;
-
                 }
-                new EmployeeListTask().execute();
+                new MemberListTask().execute();
 
             }
         });
     }
 
-    public void onDeleteGroupClicked(View view){
-        new DeleteGroupTask().execute();
-    }
-
-    class DeleteGroupTask extends AsyncTask<String, Void, Void>{
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(String... strings) {
-
-            try {
-                // Delete the group.
-                mFinalGroup.delete();
-            } catch (GroupOperationException e) {
-                // Deleting the group failed for some reasons.
-                // Please check GroupOperationException to see what went wrong...
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-    class EmployeeListTask extends AsyncTask<Void, Void, Void>{
+    //Fetch the member list based on the group name sent to the activity
+    class MemberListTask extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected void onPreExecute() {
@@ -190,13 +161,13 @@ public class ManageActivity extends Activity {
         public CheckBox authority;
     }
 
-    class EmployeeAdapter extends BaseAdapter{
+    class MemberAdapter extends BaseAdapter{
 
         private Context context;
         private KiiObject kiiObject = null;
         private String groupName;
 
-        public EmployeeAdapter(Context context){
+        public MemberAdapter(Context context){
             this.context = context;
         }
 
@@ -234,6 +205,8 @@ public class ManageActivity extends Activity {
 
             kiiObject = mObjLists.get(i);
             holder.name.setText(mObjLists.get(i).getString("username"));
+
+            //Determine the group name shows on each member
             holder.group.setText("No group");
             holder.group.setTextColor(getResources().getColor(R.color.gray));
             try {
@@ -285,6 +258,7 @@ public class ManageActivity extends Activity {
         }
     }
 
+    //Remove the member of the group
     class RemoveMemberTask extends AsyncTask< String, Void, Void>{
 
         ProgressDialog progressDialog = null;
@@ -321,13 +295,14 @@ public class ManageActivity extends Activity {
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
             if(errorMsg == null){
-                new EmployeeListTask().execute();
+                new MemberListTask().execute();
             }else{
                 Toast.makeText(ManageActivity.this, errorMsg, Toast.LENGTH_LONG).show();
             }
         }
     }
 
+    //Change the authority of the member
     class AuthorityChangeTask extends AsyncTask<String, Void, Void>{
 
         ProgressDialog progressDialog = null;
@@ -364,6 +339,7 @@ public class ManageActivity extends Activity {
         }
     }
 
+    //Add the member to security group
     class AddToSecurityTask extends AsyncTask<Void, Void, Void>{
 
         ProgressDialog progressDialog = null;
@@ -405,7 +381,7 @@ public class ManageActivity extends Activity {
             if (mAddedUser == null){
                 Toast.makeText(ManageActivity.this, R.string.user_not_found, Toast.LENGTH_LONG).show();
             }
-            new EmployeeListTask().execute();
+            new MemberListTask().execute();
 
         }
     }
@@ -451,7 +427,7 @@ public class ManageActivity extends Activity {
             if(mAddedUser == null){
                 Toast.makeText(ManageActivity.this, R.string.user_not_found, Toast.LENGTH_LONG).show();
             }
-            new EmployeeListTask().execute();
+            new MemberListTask().execute();
 
         }
     }

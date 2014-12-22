@@ -37,7 +37,7 @@ public class FirstActivity extends Activity {
                     startActivity(intent);
                     break;
                 case R.id.app:
-                    intent = new Intent(FirstActivity.this, SignInActivity.class);
+                    intent = new Intent(FirstActivity.this, LogInActivity.class);
                     startActivity(intent);
                     break;
                 case R.id.register:

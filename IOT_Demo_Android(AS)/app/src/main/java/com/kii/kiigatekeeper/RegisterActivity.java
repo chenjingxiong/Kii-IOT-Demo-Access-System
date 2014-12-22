@@ -109,7 +109,7 @@ public class RegisterActivity extends Activity {
         }
     }
 
-
+    //Register
     class RegTask extends AsyncTask<String, Void, Void> {
         ProgressDialog progressDialog = null;
         String token = null;

@@ -45,10 +45,13 @@ public class UserActivity extends Activity {
             mUsername.setText("Username: No user");
         }
 
+        //Check if the user is admin or in the security group, only these two kind of user
+        //have the manage function
         new OwnedGroupTask().execute();
 
     }
 
+    //Check the user's owned group
     class OwnedGroupTask extends AsyncTask<Void, Void, Void>{
 
         @Override
@@ -61,11 +64,11 @@ public class UserActivity extends Activity {
         protected Void doInBackground(Void... voids) {
             KiiUser user = KiiUser.getCurrentUser();
 
-            // Get a list of groups in which the current user is a member.
+            // Get a list of groups in which the current user is a owner.
             try {
                 List<KiiGroup> ownerGroups = user.ownerOfGroups();
                 for (KiiGroup group : ownerGroups) {
-                    // do something with each group
+                    // If the user owns any group, means he is the admin
                     if( ownerGroups.size() != 0){
                         mUserType = "admin";
                     }

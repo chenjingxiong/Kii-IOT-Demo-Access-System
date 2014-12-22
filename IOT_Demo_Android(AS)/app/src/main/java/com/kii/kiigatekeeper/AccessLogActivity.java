@@ -79,7 +79,7 @@ public class AccessLogActivity extends Activity {
         mLogAdapter = new LogAdapter(AccessLogActivity.this);
         mListView.setAdapter(mLogAdapter);
 
-        //parse JSONObject
+        //parse JSONObject for querying KiiObject
         JSONObject jsonObject = new JSONObject();
         JSONObject bucketQuery = new JSONObject();
         JSONObject clause = new JSONObject();
@@ -100,6 +100,7 @@ public class AccessLogActivity extends Activity {
         FetchAccessLog(jsonObject);
     }
 
+    //Fetch access log by Rest API
     private void FetchAccessLog(final JSONObject jsonObject){
 
         RequestParams params = new RequestParams();
@@ -146,6 +147,7 @@ public class AccessLogActivity extends Activity {
         });
     }
 
+    //get all the access log
     private void getData(JSONArray jsonArray){
         mAccessLogList = new ArrayList<Map<String, Object>>();
         Map<String, Object> map;
@@ -223,44 +225,6 @@ public class AccessLogActivity extends Activity {
             return convertView;
         }
     }
-
-    class FetchDataTask extends AsyncTask<Void, Void, Void> {
-
-        ProgressDialog progressDialog = null;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = new ProgressDialog(AccessLogActivity.this);
-            progressDialog.setCancelable(false);
-            progressDialog.setMessage("Fetching access logs…");
-            progressDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-    try{
-        KiiQuery all_query = new KiiQuery();
-        KiiQueryResult<KiiObject> result = Kii.bucket("access_log").query(all_query);
-        mObjLists = result.getResult();
-    } catch (IOException e) {
-        // handle error
-    } catch (AppException e) {
-        // handle error
-    }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            progressDialog.dismiss();
-            mListSize = mObjLists.size();
-            mLogAdapter.notifyDataSetChanged();
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

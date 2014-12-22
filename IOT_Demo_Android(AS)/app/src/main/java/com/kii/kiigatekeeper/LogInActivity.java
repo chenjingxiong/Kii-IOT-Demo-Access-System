@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.kii.cloud.storage.KiiUser;
 
-public class SignInActivity extends Activity {
+public class LogInActivity extends Activity {
 
     private EditText mUsernameEdit;
     private EditText mPasswordEdit;
@@ -42,11 +42,11 @@ public class SignInActivity extends Activity {
             text[0] = mUsernameEdit.getText().toString();
             text[1] = mPasswordEdit.getText().toString();
             if (!KiiUser.isValidUserName(text[0])) {
-                Toast.makeText(SignInActivity.this, "Username is not valid", Toast.LENGTH_LONG).show();
+                Toast.makeText(LogInActivity.this, "Username is not valid", Toast.LENGTH_LONG).show();
                 return;
             }
             if (!KiiUser.isValidPassword(text[1])) {
-                Toast.makeText(SignInActivity.this, "Password is not valid", Toast.LENGTH_LONG)
+                Toast.makeText(LogInActivity.this, "Password is not valid", Toast.LENGTH_LONG)
                         .show();
                 return;
             }
@@ -62,6 +62,8 @@ public class SignInActivity extends Activity {
         }
     };
 
+
+    //Login
     class LoginOrRegTask extends AsyncTask<String, Void, Void> {
 
         ProgressDialog progressDialog = null;
@@ -73,7 +75,7 @@ public class SignInActivity extends Activity {
             super.onPostExecute(result);
             progressDialog.dismiss();
 
-            Activity activity = SignInActivity.this;
+            Activity activity = LogInActivity.this;
 
             if (TextUtils.isEmpty(token)) {
                 Toast.makeText(activity,
@@ -84,7 +86,7 @@ public class SignInActivity extends Activity {
                 Toast.makeText(activity, "Login successful",
                         Toast.LENGTH_LONG).show();
 
-                Intent intent = new Intent(SignInActivity.this, UserActivity.class);
+                Intent intent = new Intent(LogInActivity.this, UserActivity.class);
                 startActivity(intent);
             }
         }
@@ -92,7 +94,7 @@ public class SignInActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(SignInActivity.this);
+            progressDialog = new ProgressDialog(LogInActivity.this);
             progressDialog.setMessage("In progressing");
             progressDialog.setCancelable(false);
             progressDialog.show();

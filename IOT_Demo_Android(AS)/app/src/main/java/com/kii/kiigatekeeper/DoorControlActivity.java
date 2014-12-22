@@ -220,6 +220,8 @@ public class DoorControlActivity extends Activity {
             viewHolder.devicetxPower_RSSI.setText("txPower:"+device.txPower+",rssi:"+device.rssi);
             mBeaconMajorMinor = String.valueOf(device.major) + String.valueOf(device.minor);
 
+            //When rssi is bigger then -30, run the authorize task. Variable mDistanceCheck makes sure it
+            // doesn't send request repeatly
             if(device.rssi >= -30 && mDistanceCheck == true){
                 new AuthoriseTask().execute();
                 mDistanceCheck = false;
@@ -240,7 +242,7 @@ public class DoorControlActivity extends Activity {
         }
     }
 
-    //Using server extension to authorize
+    //Use server extension to authorize
     class AuthoriseTask extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog progressDialog = null;
