@@ -557,7 +557,7 @@ function modify_access_log_acl(data, done, secure_profile) {
 
 * `security`组中的用户将可以看到所有的Access Log
 * `employee`组中得用户仅可以看到自己的Access Log
-* 没有被加入以上两个组中得用户无法看到任何Access Log
+* 没有被加入以上两个群组中的用户无法看到任何Access Log
 
 #####Java代码
 ~~~java
