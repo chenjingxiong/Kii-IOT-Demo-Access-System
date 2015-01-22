@@ -59,6 +59,7 @@ public class AccessLogActivity extends Activity {
     private List<Map<String, Object>> mAccessLogList;
     private int mAccessLogNum = 0;
     private ProgressDialog mProgressDialog = null;
+    private String mErrorString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,14 +111,17 @@ public class AccessLogActivity extends Activity {
         params.setHeader("content-type", "application/vnd.kii.QueryRequest+json");
         params.setHeader("Authorization", "Bearer "+ mKiiUser.getAccessToken());
 
+
         try {
             params.setBodyEntity(new StringEntity(jsonObject.toString()));
         }catch (UnsupportedEncodingException e){
             Toast.makeText(AccessLogActivity.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
 
+        ServerUrl serverUrl = new ServerUrl();
+
         HttpUtils http = new HttpUtils();
-        http.send(HttpRequest.HttpMethod.POST, ServerUrl.url,params, new RequestCallBack<Object>() {
+        http.send(HttpRequest.HttpMethod.POST, serverUrl.determineURl() ,params, new RequestCallBack<Object>() {
             @Override
             public void onStart() {
                 mProgressDialog.show();
@@ -135,7 +139,7 @@ public class AccessLogActivity extends Activity {
                     getData(mJsonArray);
 
                 }catch (JSONException e){
-                    e.printStackTrace();
+                    Toast.makeText(AccessLogActivity.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
             }
 

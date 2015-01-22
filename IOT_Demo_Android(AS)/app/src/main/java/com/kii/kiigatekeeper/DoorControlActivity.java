@@ -87,19 +87,69 @@ public class DoorControlActivity extends Activity {
         // Initializes list view adapter.
         mLeDeviceListAdapter = new LeDeviceListAdapter(this);
         mListView.setAdapter(mLeDeviceListAdapter);
-        scanLeDevice(true);
+//        scanLeDevice(true);
+        TheOldWay theOldWay = new TheOldWay();
+        theOldWay.beginScanning();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        scanLeDevice(false);
+//        scanLeDevice(false);
         mLeDeviceListAdapter.clear();
     }
 
-    private void scanLeDevice(final boolean enable) {
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
+
+    //因为现在android ble的api不够稳定，不同的android手机会出现不同的ble扫描情况，有些可以持续扫描，有些只能扫描一次，所以这里统一改成持续扫描
+    public class TheOldWay {
+
+        private static final int SCAN_INTERVAL_MS = 250;
+
+        private Handler scanHandler = new Handler();
+        private boolean isScanning = false;
+
+        public void beginScanning() {
+            scanHandler.post(scanRunnable);
+        }
+
+        private Runnable scanRunnable = new Runnable() {
+            @Override
+            public void run() {
+                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+
+                if (isScanning) {
+                    adapter.stopLeScan(leScanCallback);
+                } else if (!adapter.startLeScan(leScanCallback)) {
+                    // an error occurred during startLeScan
+                }
+
+                isScanning = !isScanning;
+
+                scanHandler.postDelayed(this, SCAN_INTERVAL_MS);
+            }
+        };
+
+        private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
+            @Override
+            public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                // use the RSSI value
+
+                final iBeaconClass.iBeacon ibeacon = iBeaconClass.fromScanData(device,rssi,scanRecord);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLeDeviceListAdapter.addDevice(ibeacon);
+                        mLeDeviceListAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        };
+
+    }
+
+//    private void scanLeDevice(final boolean enable) {
+//        if (enable) {
+////            Stops scanning after a pre-defined scan period.
 //            mHandler.postDelayed(new Runnable() {
 //                @Override
 //                public void run() {
@@ -108,15 +158,15 @@ public class DoorControlActivity extends Activity {
 //                    invalidateOptionsMenu();
 //                }
 //            }, SCAN_PERIOD);
-
-            mScanning = true;
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
-        } else {
-            mScanning = false;
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-        }
-        invalidateOptionsMenu();
-    }
+//
+//            mScanning = true;
+//            mBluetoothAdapter.startLeScan(mLeScanCallback);
+//        } else {
+//            mScanning = false;
+//            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//        }
+//        invalidateOptionsMenu();
+//    }
 
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
@@ -222,12 +272,12 @@ public class DoorControlActivity extends Activity {
 
             //When rssi is bigger then -30, run the authorize task. Variable mDistanceCheck makes sure it
             // doesn't send request repeatly
-            if(device.rssi >= -30 && mDistanceCheck == true){
+            if(device.rssi >= -35 && mDistanceCheck == true){
                 new AuthoriseTask().execute();
                 mDistanceCheck = false;
             }
 
-            if(device.rssi <= -60 && mDistanceCheck == false){
+            if(device.rssi <= -65 && mDistanceCheck == false){
                 mDistanceCheck = true;
             }
             return view;
